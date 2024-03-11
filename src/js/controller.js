@@ -18,32 +18,31 @@ const controlRecipes = async function () {
     if (!id) return;
     recipeView.renderSpinner();
 
-    // 1) LOADING RECIPE
+    // Loading recipe
     await model.loadRecipe(id);
 
-    // 2) RENDERING RECIPE
+    // Rendering recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
     recipeView.renderMessage();
   }
 };
 
-// SEARCH RESULTS //
 const controlSearchResults = async function () {
   try {
     resultsView.renderSpinner();
 
-    // GET SEARCH QUERY
+    // Get search query
     const query = searchView.getQuery();
     if (!query) return;
 
-    // LOAD SEARCH RESULTS
+    // Load search results
     await model.loadSearchResults(query);
 
-    // RENDER RESULTS
+    // Rensder results
     resultsView.render(model.getSearchResultsPage());
 
-    // RENDER INITIAL PAGINATION BUTTONS
+    // Render initial pagination buttons
     paginationView.render(model.state.search);
   } catch (err) {
     console.log(err);
@@ -51,16 +50,24 @@ const controlSearchResults = async function () {
 };
 
 const controlPagination = function (goToPage) {
-  // RENDER NEW RESULTS
+  // Render NEW results
   resultsView.render(model.getSearchResultsPage(goToPage));
 
-  // RENDER NEW PAGINATION BUTTONS
+  // Render NEW pagination buttons
   paginationView.render(model.state.search);
+};
+
+const controlServings = function (newServings) {
+  // Update the recipe servings (in state)
+  model.updateServings(newServings);
+  // Update the recipe view
+  recipeView.render(model.state.recipe);
 };
 
 // SUBSCRIBER - PUBLISHER PATTERN //
 const init = function () {
   recipeView.addHandlerRender(controlRecipes);
+  recipeView.addHandlerUpdateServings(controlServings);
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerClick(controlPagination);
 };
